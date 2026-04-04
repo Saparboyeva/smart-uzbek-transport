@@ -1,10 +1,12 @@
-import { AlertTriangle, TrendingUp, Clock } from "lucide-react";
+import { AlertTriangle, Clock } from "lucide-react";
+import { MapContainer, TileLayer, Circle, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 const zones = [
-  { name: "Chorsu atrofi", level: "Yuqori", color: "bg-destructive/10 text-destructive border-destructive/20" },
-  { name: "Amir Temur ko'chasi", level: "O'rtacha", color: "bg-warning/10 text-warning border-warning/20" },
-  { name: "Yunusobod tomon", level: "Past", color: "bg-success/10 text-success border-success/20" },
-  { name: "Sergeli yo'li", level: "O'rtacha", color: "bg-warning/10 text-warning border-warning/20" },
+  { name: "Chorsu atrofi", level: "Yuqori", color: "bg-destructive/10 text-destructive border-destructive/20", lat: 41.3265, lng: 69.2290, mapColor: "#dc2626", radius: 800 },
+  { name: "Amir Temur ko'chasi", level: "O'rtacha", color: "bg-warning/10 text-warning border-warning/20", lat: 41.3110, lng: 69.2795, mapColor: "#d97706", radius: 600 },
+  { name: "Yunusobod tomon", level: "Past", color: "bg-success/10 text-success border-success/20", lat: 41.3520, lng: 69.2850, mapColor: "#16a34a", radius: 700 },
+  { name: "Sergeli yo'li", level: "O'rtacha", color: "bg-warning/10 text-warning border-warning/20", lat: 41.2500, lng: 69.2200, mapColor: "#d97706", radius: 900 },
 ];
 
 const TrafficMap = () => (
@@ -16,43 +18,58 @@ const TrafficMap = () => (
         <p className="text-muted-foreground mt-3">Shahar bo'ylab real vaqt tirbandlik</p>
       </div>
 
-      <div className="max-w-2xl mx-auto">
-        {/* Simulated traffic map */}
-        <div className="bg-secondary rounded-2xl p-8 mb-8 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div
-                key={i}
-                className="absolute h-px bg-secondary-foreground/30"
-                style={{
-                  top: `${12 + i * 12}%`,
-                  left: "5%",
-                  right: "5%",
-                  transform: `rotate(${(i % 3 - 1) * 15}deg)`,
+      <div className="max-w-4xl mx-auto">
+        {/* Real traffic map */}
+        <div className="rounded-2xl overflow-hidden shadow-card mb-8 border border-border">
+          <MapContainer
+            center={[41.305, 69.255]}
+            zoom={11}
+            style={{ height: "450px", width: "100%" }}
+            scrollWheelZoom={false}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            {zones.map((zone) => (
+              <Circle
+                key={zone.name}
+                center={[zone.lat, zone.lng]}
+                radius={zone.radius}
+                pathOptions={{
+                  color: zone.mapColor,
+                  fillColor: zone.mapColor,
+                  fillOpacity: 0.25,
+                  weight: 2,
                 }}
-              />
+              >
+                <Popup>
+                  <strong>{zone.name}</strong>
+                  <br />
+                  Tirbandlik: {zone.level}
+                </Popup>
+              </Circle>
             ))}
+          </MapContainer>
+        </div>
+
+        {/* Legend */}
+        <div className="flex justify-center gap-6 mb-8">
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-3 h-3 rounded-full bg-destructive animate-pulse-dot" />
+            <span className="text-muted-foreground">Yuqori</span>
           </div>
-          <div className="relative text-center text-secondary-foreground">
-            <div className="text-6xl font-extrabold mb-2">Toshkent</div>
-            <p className="text-secondary-foreground/60 text-sm">Real vaqt tirbandlik ma'lumotlari</p>
-            <div className="flex justify-center gap-6 mt-6">
-              <div className="flex items-center gap-2 text-sm">
-                <div className="w-3 h-3 rounded-full bg-destructive animate-pulse-dot" />
-                <span className="text-secondary-foreground/80">Yuqori</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <div className="w-3 h-3 rounded-full bg-warning" />
-                <span className="text-secondary-foreground/80">O'rtacha</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <div className="w-3 h-3 rounded-full bg-success" />
-                <span className="text-secondary-foreground/80">Past</span>
-              </div>
-            </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-3 h-3 rounded-full bg-warning" />
+            <span className="text-muted-foreground">O'rtacha</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-3 h-3 rounded-full bg-success" />
+            <span className="text-muted-foreground">Past</span>
           </div>
         </div>
 
+        {/* Zone list */}
         <div className="space-y-3">
           {zones.map((z) => (
             <div key={z.name} className={`rounded-xl p-4 border flex items-center justify-between ${z.color}`}>
