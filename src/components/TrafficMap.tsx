@@ -79,6 +79,76 @@ const regions: Record<string, Region> = {
     ],
     rushHour: "08:00 - 09:30, 17:30 - 19:00",
   },
+  xorazm: {
+    name: "Xorazm (Urganch)",
+    zones: [
+      { name: "Markaz atrofi", level: "O'rtacha" },
+      { name: "Xiva yo'li", level: "Past" },
+      { name: "Bozor atrofi", level: "Yuqori" },
+      { name: "Al-Xorazmiy ko'chasi", level: "O'rtacha" },
+    ],
+    rushHour: "08:00 - 09:30, 17:00 - 18:30",
+  },
+  qashqadaryo: {
+    name: "Qashqadaryo (Qarshi)",
+    zones: [
+      { name: "Markaz atrofi", level: "O'rtacha" },
+      { name: "Nasaf ko'chasi", level: "Yuqori" },
+      { name: "Shahrisabz yo'li", level: "Past" },
+      { name: "Bozor atrofi", level: "O'rtacha" },
+    ],
+    rushHour: "07:30 - 09:00, 17:00 - 18:30",
+  },
+  surxondaryo: {
+    name: "Surxondaryo (Termiz)",
+    zones: [
+      { name: "Markaz atrofi", level: "O'rtacha" },
+      { name: "Chegarа yo'li", level: "Past" },
+      { name: "Bozor atrofi", level: "Yuqori" },
+      { name: "Aeroport tomon", level: "Past" },
+    ],
+    rushHour: "08:00 - 09:30, 17:30 - 19:00",
+  },
+  jizzax: {
+    name: "Jizzax",
+    zones: [
+      { name: "Markaz ko'chasi", level: "O'rtacha" },
+      { name: "Bozor atrofi", level: "Yuqori" },
+      { name: "Zomin yo'li", level: "Past" },
+      { name: "Avtovokzal tomon", level: "O'rtacha" },
+    ],
+    rushHour: "07:30 - 09:00, 17:00 - 18:30",
+  },
+  sirdaryo: {
+    name: "Sirdaryo (Guliston)",
+    zones: [
+      { name: "Markaz atrofi", level: "O'rtacha" },
+      { name: "Bozor atrofi", level: "O'rtacha" },
+      { name: "Sirdaryo ko'prigi", level: "Past" },
+      { name: "Yangiyer yo'li", level: "Past" },
+    ],
+    rushHour: "08:00 - 09:30, 17:00 - 18:30",
+  },
+  navoiy: {
+    name: "Navoiy",
+    zones: [
+      { name: "Markaz atrofi", level: "O'rtacha" },
+      { name: "Sanoat zonasi", level: "Yuqori" },
+      { name: "Zarafshon yo'li", level: "Past" },
+      { name: "Bozor atrofi", level: "O'rtacha" },
+    ],
+    rushHour: "07:30 - 09:00, 17:00 - 18:30",
+  },
+  toshkent_vil: {
+    name: "Toshkent viloyati",
+    zones: [
+      { name: "Chirchiq markazi", level: "O'rtacha" },
+      { name: "Olmaliq yo'li", level: "Past" },
+      { name: "Angren tomon", level: "O'rtacha" },
+      { name: "Nurafshon ko'chasi", level: "Yuqori" },
+    ],
+    rushHour: "07:30 - 09:30, 17:00 - 19:00",
+  },
 };
 
 const levelStyles: Record<string, string> = {
