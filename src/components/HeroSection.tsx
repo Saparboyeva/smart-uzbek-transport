@@ -1,6 +1,12 @@
 import { MapPin, Clock, TrendingDown } from "lucide-react";
 import heroImg from "@/assets/hero-transport.jpg";
 
+const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  e.preventDefault();
+  const el = document.querySelector(href);
+  if (el) el.scrollIntoView({ behavior: "smooth" });
+};
+
 const stats = [
   { icon: MapPin, value: "50+", label: "Yo'nalishlar" },
   { icon: Clock, value: "Real vaqt", label: "Kuzatuv" },
@@ -27,10 +33,10 @@ const HeroSection = () => (
           Avtobus kuzatish, arzon yo'nalish topish, carpool va tirbandlik xaritasi — barchasi Smart Transport da.
         </p>
         <div className="flex flex-wrap gap-4 mb-14">
-          <a href="#route" className="bg-primary text-primary-foreground px-8 py-3.5 rounded-xl font-semibold text-base hover:opacity-90 transition-opacity shadow-lg">
+          <a href="#route" onClick={(e) => scrollTo(e, "#route")} className="bg-primary text-primary-foreground px-8 py-3.5 rounded-xl font-semibold text-base hover:opacity-90 transition-opacity shadow-lg">
             Yo'nalish topish →
           </a>
-          <a href="#features" className="bg-secondary-foreground/10 text-secondary-foreground border border-secondary-foreground/20 px-8 py-3.5 rounded-xl font-semibold text-base hover:bg-secondary-foreground/20 transition-colors backdrop-blur-sm">
+          <a href="#features" onClick={(e) => scrollTo(e, "#features")} className="bg-secondary-foreground/10 text-secondary-foreground border border-secondary-foreground/20 px-8 py-3.5 rounded-xl font-semibold text-base hover:bg-secondary-foreground/20 transition-colors backdrop-blur-sm">
             Batafsil
           </a>
         </div>
