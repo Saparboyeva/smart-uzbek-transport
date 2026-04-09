@@ -9,6 +9,12 @@ const navLinks = [
   { label: "Carpool", href: "#carpool" },
 ];
 
+const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  e.preventDefault();
+  const el = document.querySelector(href);
+  if (el) el.scrollIntoView({ behavior: "smooth" });
+};
+
 const Navbar = () => {
   const [open, setOpen] = useState(false);
 

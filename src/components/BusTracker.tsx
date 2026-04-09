@@ -1,5 +1,6 @@
 import { Bus, Bell, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const buses = [
   { id: "35", name: "35-marshrut", from: "Chorsu", to: "Sergeli", eta: 3, status: "kelmoqda" },
