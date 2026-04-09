@@ -7,7 +7,10 @@ const rides = [
   { driver: "Bobur", from: "Minor", to: "Buyuk Ipak Yo'li", time: "07:45", seats: 1, rating: 4.7, price: "6,500" },
 ];
 
-const CarpoolSection = () => (
+const CarpoolSection = () => {
+  const { toast } = useToast();
+
+  return (
   <section id="carpool" className="py-24 bg-muted/50">
     <div className="container mx-auto px-4">
       <div className="text-center mb-12">
@@ -44,7 +47,10 @@ const CarpoolSection = () => (
             </div>
             <div className="flex items-center justify-between">
               <span className="font-bold text-card-foreground">{ride.price} so'm</span>
-              <button className="bg-primary text-primary-foreground text-xs font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity">
+              <button
+                onClick={() => toast({ title: "So'rov yuborildi ✅", description: `${ride.driver}ga qo'shilish so'rovi yuborildi` })}
+                className="bg-primary text-primary-foreground text-xs font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+              >
                 Qo'shilish
               </button>
             </div>
@@ -53,6 +59,6 @@ const CarpoolSection = () => (
       </div>
     </div>
   </section>
-);
-
+  );
+};
 export default CarpoolSection;

@@ -1,5 +1,6 @@
 import { ArrowRight, Bus, Car, Train, Clock, Banknote } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const routes = [
   { type: "Avtobus", icon: Bus, time: "25 daq", cost: "1,500 so'm", color: "text-primary" },
@@ -8,9 +9,19 @@ const routes = [
 ];
 
 const RouteCalculator = () => {
+  const { toast } = useToast();
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [show, setShow] = useState(false);
+
+  const handleSearch = () => {
+    if (!from.trim() || !to.trim()) {
+      toast({ title: "Iltimos, maydonlarni to'ldiring", description: "Qayerdan va qayerga borish kerakligini kiriting", variant: "destructive" });
+      return;
+    }
+    setShow(true);
+    toast({ title: "Yo'nalishlar topildi ✅", description: `${from} → ${to} uchun variantlar` });
+  };
 
   return (
     <section id="route" className="py-24 bg-background">
@@ -39,7 +50,9 @@ const RouteCalculator = () => {
               />
             </div>
             <button
-              onClick={() => setShow(true)}
+              onClick={handleSearch}
+              className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity"
+            >
               className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity"
             >
               Yo'nalish topish
