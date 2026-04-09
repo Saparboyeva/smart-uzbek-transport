@@ -53,8 +53,6 @@ const RouteCalculator = () => {
               onClick={handleSearch}
               className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity"
             >
-              className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity"
-            >
               Yo'nalish topish
             </button>
           </div>
