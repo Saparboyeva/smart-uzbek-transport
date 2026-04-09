@@ -1,5 +1,6 @@
 import { Bus, Bell, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const buses = [
   { id: "35", name: "35-marshrut", from: "Chorsu", to: "Sergeli", eta: 3, status: "kelmoqda" },
@@ -16,6 +17,7 @@ const statusColors: Record<string, string> = {
 };
 
 const BusTracker = () => {
+  const { toast } = useToast();
   const [times, setTimes] = useState(buses.map((b) => b.eta));
 
   useEffect(() => {
@@ -52,7 +54,11 @@ const BusTracker = () => {
                 <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusColors[bus.status]}`}>
                   {times[i]} daq
                 </span>
-                <button className="text-muted-foreground hover:text-accent transition-colors" title="Bildirishnoma">
+                <button
+                  className="text-muted-foreground hover:text-accent transition-colors"
+                  title="Bildirishnoma"
+                  onClick={() => toast({ title: "Bildirishnoma o'rnatildi ✅", description: `${bus.name} yetib kelganda xabar beramiz` })}
+                >
                   <Bell className="h-4 w-4" />
                 </button>
               </div>

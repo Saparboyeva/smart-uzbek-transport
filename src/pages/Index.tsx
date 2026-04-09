@@ -8,7 +8,7 @@ import TrafficMap from "@/components/TrafficMap";
 import Footer from "@/components/Footer";
 
 const Index = () => (
-  <div className="min-h-screen">
+  <div className="min-h-screen scroll-smooth">
     <Navbar />
     <HeroSection />
     <FeaturesSection />
