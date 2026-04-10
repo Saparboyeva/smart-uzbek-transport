@@ -5,6 +5,10 @@ import BusTracker from "@/components/BusTracker";
 import RouteCalculator from "@/components/RouteCalculator";
 import CarpoolSection from "@/components/CarpoolSection";
 import TrafficMap from "@/components/TrafficMap";
+import PredictiveAI from "@/components/PredictiveAI";
+import PersonalAI from "@/components/PersonalAI";
+import VoiceAssistant from "@/components/VoiceAssistant";
+import SafetyAI from "@/components/SafetyAI";
 import Footer from "@/components/Footer";
 
 const Index = () => (
@@ -16,6 +20,10 @@ const Index = () => (
     <RouteCalculator />
     <CarpoolSection />
     <TrafficMap />
+    <PredictiveAI />
+    <PersonalAI />
+    <VoiceAssistant />
+    <SafetyAI />
     <Footer />
   </div>
 );
