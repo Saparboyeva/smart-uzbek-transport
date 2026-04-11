@@ -1,28 +1,18 @@
 import { useState } from "react";
 import { Mic, MicOff, Volume2, Car, MapPin, Navigation } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-type VoiceCommand = {
-  command: string;
-  response: string;
-  action: string;
-  icon: typeof Car;
-};
-
-const mockCommands: VoiceCommand[] = [
-  { command: "Menga yaqin taksi top", response: "Eng yaqin taksi 3 daqiqada yetib keladi. Narxi: 15,000 so'm", action: "Taksi chaqirildi", icon: Car },
-  { command: "Uyga eng tez yo'l", response: "Metro orqali 25 daqiqa. Hozir tirbandlik bor, metro tavsiya etiladi", action: "Yo'nalish ko'rsatildi", icon: Navigation },
-  { command: "Chilonzorda tirbandlik bormi", response: "Ha, Chilonzor → Markaz yo'lida yuqori tirbandlik. Boshqa yo'l tanlang", action: "Tirbandlik tekshirildi", icon: MapPin },
-  { command: "Eng arzon transport", response: "Avtobus №67 — 1,500 so'm. 10 daqiqada keladi", action: "Avtobus topildi", icon: Car },
-];
+import { useRegion } from "@/contexts/RegionContext";
+import { regionVoiceCommands } from "@/data/regionData";
 
 const VoiceAssistant = () => {
   const [listening, setListening] = useState(false);
-  const [currentCommand, setCurrentCommand] = useState<VoiceCommand | null>(null);
+  const [currentCommand, setCurrentCommand] = useState<{ command: string; response: string; action: string } | null>(null);
   const [processing, setProcessing] = useState(false);
   const { toast } = useToast();
+  const { selected, regionName } = useRegion();
+  const commands = regionVoiceCommands[selected];
 
-  const simulateVoice = (cmd: VoiceCommand) => {
+  const simulateVoice = (cmd: typeof commands[0]) => {
     setListening(true);
     setCurrentCommand(null);
     setProcessing(false);
@@ -47,7 +37,7 @@ const VoiceAssistant = () => {
             <Volume2 className="h-4 w-4" /> Voice Assistant
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-2">
-            Ovozli AI yordamchi
+            Ovozli AI yordamchi — {regionName}
           </h2>
           <p className="text-muted-foreground mt-3 max-w-lg mx-auto">
             Ovoz bilan buyruq bering — AI tushunadi va darrov bajaradi
@@ -55,21 +45,16 @@ const VoiceAssistant = () => {
         </div>
 
         <div className="max-w-2xl mx-auto">
-          {/* Mic Button */}
           <div className="flex justify-center mb-8">
             <div className="relative">
-              {listening && (
-                <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
-              )}
+              {listening && <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />}
               <button
                 className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-all ${
-                  listening
-                    ? "bg-destructive text-destructive-foreground scale-110"
-                    : "bg-primary text-primary-foreground hover:scale-105"
+                  listening ? "bg-destructive text-destructive-foreground scale-110" : "bg-primary text-primary-foreground hover:scale-105"
                 }`}
                 onClick={() => {
                   if (!listening && !processing) {
-                    const cmd = mockCommands[Math.floor(Math.random() * mockCommands.length)];
+                    const cmd = commands[Math.floor(Math.random() * commands.length)];
                     simulateVoice(cmd);
                   }
                 }}
@@ -87,7 +72,6 @@ const VoiceAssistant = () => {
             {listening ? "🎤 Tinglayapman..." : processing ? "🧠 AI tahlil qilmoqda..." : "Mikrofon tugmasini bosing"}
           </p>
 
-          {/* AI Response */}
           {currentCommand && (
             <div className="bg-card rounded-2xl shadow-card p-6 mb-8 animate-fade-in">
               <div className="flex items-center gap-2 mb-3">
@@ -99,17 +83,16 @@ const VoiceAssistant = () => {
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <currentCommand.icon className="h-4 w-4 text-primary" />
+                  <Car className="h-4 w-4 text-primary" />
                 </div>
                 <p className="text-sm text-card-foreground font-medium">{currentCommand.response}</p>
               </div>
             </div>
           )}
 
-          {/* Example commands */}
           <h3 className="font-semibold text-foreground mb-4 text-sm">Namuna buyruqlar:</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {mockCommands.map((cmd, i) => (
+            {commands.map((cmd, i) => (
               <button
                 key={i}
                 onClick={() => simulateVoice(cmd)}
@@ -117,7 +100,7 @@ const VoiceAssistant = () => {
                 className="bg-card rounded-xl p-4 shadow-card text-left hover:shadow-card-hover transition-shadow disabled:opacity-50"
               >
                 <div className="flex items-center gap-2 mb-2">
-                  <cmd.icon className="h-4 w-4 text-primary" />
+                  <Navigation className="h-4 w-4 text-primary" />
                   <span className="text-xs font-semibold text-primary">Buyruq</span>
                 </div>
                 <p className="text-sm text-card-foreground font-medium">"{cmd.command}"</p>

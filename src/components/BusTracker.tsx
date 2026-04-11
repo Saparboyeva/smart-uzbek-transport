@@ -1,14 +1,8 @@
 import { Bus, Bell, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-
-const buses = [
-  { id: "35", name: "35-marshrut", from: "Chorsu", to: "Sergeli", eta: 3, status: "kelmoqda" },
-  { id: "67", name: "67-marshrut", from: "Oybek", to: "Buyuk Ipak Yo'li", eta: 7, status: "yo'lda" },
-  { id: "12", name: "12-marshrut", from: "Minor", to: "Yunusobod", eta: 1, status: "yaqin" },
-  { id: "94", name: "94-marshrut", from: "Tinchlik", to: "Beruniy", eta: 12, status: "yo'lda" },
-  { id: "51", name: "51-marshrut", from: "Hamid Olimjon", to: "Chilonzor", eta: 5, status: "kelmoqda" },
-];
+import { useRegion } from "@/contexts/RegionContext";
+import { regionBuses } from "@/data/regionData";
 
 const statusColors: Record<string, string> = {
   yaqin: "bg-success text-success-foreground",
@@ -18,7 +12,13 @@ const statusColors: Record<string, string> = {
 
 const BusTracker = () => {
   const { toast } = useToast();
+  const { selected, regionName } = useRegion();
+  const buses = regionBuses[selected];
   const [times, setTimes] = useState(buses.map((b) => b.eta));
+
+  useEffect(() => {
+    setTimes(buses.map((b) => b.eta));
+  }, [selected]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -32,7 +32,7 @@ const BusTracker = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <span className="text-primary text-sm font-semibold uppercase tracking-wider">Real vaqt</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-2">Avtobus kuzatuv</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-2">Avtobus kuzatuv — {regionName}</h2>
           <p className="text-muted-foreground mt-3">Yaqin avtobuslarni real vaqtda kuzating</p>
         </div>
 
@@ -52,7 +52,7 @@ const BusTracker = () => {
               </div>
               <div className="flex items-center gap-3">
                 <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusColors[bus.status]}`}>
-                  {times[i]} daq
+                  {times[i] ?? bus.eta} daq
                 </span>
                 <button
                   className="text-muted-foreground hover:text-accent transition-colors"

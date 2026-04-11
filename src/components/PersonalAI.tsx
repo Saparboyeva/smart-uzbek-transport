@@ -1,48 +1,32 @@
 import { useState } from "react";
 import { UserCheck, Clock, MapPin, Zap, Car, Train, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-type Habit = {
-  id: number;
-  time: string;
-  from: string;
-  to: string;
-  transport: string;
-  frequency: string;
-  icon: typeof Car;
-};
-
-type Suggestion = {
-  id: number;
-  message: string;
-  action: string;
-  icon: typeof Zap;
-  type: "info" | "action" | "warning";
-};
-
-const mockHabits: Habit[] = [
-  { id: 1, time: "08:30", from: "Uy", to: "Ish joyi", transport: "Metro", frequency: "Har kuni", icon: Train },
-  { id: 2, time: "18:00", from: "Ish joyi", to: "Uy", transport: "Taksi", frequency: "Har kuni", icon: Car },
-  { id: 3, time: "10:00", from: "Uy", to: "Chorsu bozor", transport: "Avtobus", frequency: "Shanba", icon: Train },
-  { id: 4, time: "14:00", from: "Uy", to: "Fitness", transport: "Yurish", frequency: "Du/Cho/Ju", icon: MapPin },
-];
-
-const mockSuggestions: Suggestion[] = [
-  { id: 1, message: "Har kuni 8:30 da ishga chiqasiz. Taksi chaqiraymi?", action: "Taksi chaqirish", icon: Car, type: "action" },
-  { id: 2, message: "Bugun tirbandlik bor, ertaroq chiqing (08:00)", action: "Eslatma qo'yish", icon: Clock, type: "warning" },
-  { id: 3, message: "Shanba kuni Chorsu bozorga borasiz. Avtobus 15 daqiqada keladi", action: "Kuzatish", icon: Train, type: "info" },
-  { id: 4, message: "Bu hafta metro bilan 12,000 so'm tejadingiz!", action: "Batafsil", icon: Zap, type: "info" },
-];
-
-const typeStyles: Record<string, string> = {
-  info: "bg-primary/10 border-primary/20",
-  action: "bg-success/10 border-success/20",
-  warning: "bg-warning/10 border-warning/20",
-};
+import { useRegion } from "@/contexts/RegionContext";
 
 const PersonalAI = () => {
   const [activeTab, setActiveTab] = useState<"habits" | "suggestions">("suggestions");
   const { toast } = useToast();
+  const { regionName } = useRegion();
+
+  const mockSuggestions = [
+    { id: 1, message: `Har kuni 8:30 da ${regionName}da ishga chiqasiz. Taksi chaqiraymi?`, action: "Taksi chaqirish", icon: Car, type: "action" as const },
+    { id: 2, message: `Bugun ${regionName}da tirbandlik bor, ertaroq chiqing (08:00)`, action: "Eslatma qo'yish", icon: Clock, type: "warning" as const },
+    { id: 3, message: `${regionName}da bozorga borasiz. Avtobus 15 daqiqada keladi`, action: "Kuzatish", icon: Train, type: "info" as const },
+    { id: 4, message: `Bu hafta ${regionName}da metro bilan 12,000 so'm tejadingiz!`, action: "Batafsil", icon: Zap, type: "info" as const },
+  ];
+
+  const mockHabits = [
+    { id: 1, time: "08:30", from: "Uy", to: "Ish joyi", transport: "Metro", frequency: "Har kuni", icon: Train },
+    { id: 2, time: "18:00", from: "Ish joyi", to: "Uy", transport: "Taksi", frequency: "Har kuni", icon: Car },
+    { id: 3, time: "10:00", from: "Uy", to: "Bozor", transport: "Avtobus", frequency: "Shanba", icon: Train },
+    { id: 4, time: "14:00", from: "Uy", to: "Fitness", transport: "Yurish", frequency: "Du/Cho/Ju", icon: MapPin },
+  ];
+
+  const typeStyles: Record<string, string> = {
+    info: "bg-primary/10 border-primary/20",
+    action: "bg-success/10 border-success/20",
+    warning: "bg-warning/10 border-warning/20",
+  };
 
   return (
     <section className="py-24 bg-background">
@@ -52,7 +36,7 @@ const PersonalAI = () => {
             <UserCheck className="h-4 w-4" /> Personal AI
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-2">
-            Shaxsiy AI yordamchi
+            Shaxsiy AI yordamchi — {regionName}
           </h2>
           <p className="text-muted-foreground mt-3 max-w-lg mx-auto">
             AI sizning kundalik odatlaringizni o'rganib, aqlli tavsiyalar beradi
@@ -60,7 +44,6 @@ const PersonalAI = () => {
         </div>
 
         <div className="max-w-2xl mx-auto">
-          {/* Tabs */}
           <div className="flex bg-muted rounded-xl p-1 mb-8">
             <button
               onClick={() => setActiveTab("suggestions")}

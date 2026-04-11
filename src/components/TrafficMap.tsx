@@ -1,16 +1,12 @@
-import { useState } from "react";
 import { AlertTriangle, Clock, MapPin } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useRegion, regionNames, RegionKey } from "@/contexts/RegionContext";
 
-type Region = {
-  name: string;
-  zones: { name: string; level: "Yuqori" | "O'rtacha" | "Past" }[];
-  rushHour: string;
-};
+type Zone = { name: string; level: "Yuqori" | "O'rtacha" | "Past" };
+type Region = { zones: Zone[]; rushHour: string };
 
-const regions: Record<string, Region> = {
+const regions: Record<RegionKey, Region> = {
   toshkent: {
-    name: "Toshkent",
     zones: [
       { name: "Chorsu atrofi", level: "Yuqori" },
       { name: "Amir Temur ko'chasi", level: "O'rtacha" },
@@ -20,7 +16,6 @@ const regions: Record<string, Region> = {
     rushHour: "08:00 - 10:00, 17:00 - 19:00",
   },
   samarqand: {
-    name: "Samarqand",
     zones: [
       { name: "Registon atrofi", level: "Yuqori" },
       { name: "Universitet ko'chasi", level: "O'rtacha" },
@@ -30,7 +25,6 @@ const regions: Record<string, Region> = {
     rushHour: "07:30 - 09:30, 17:00 - 19:00",
   },
   buxoro: {
-    name: "Buxoro",
     zones: [
       { name: "Ark qal'a atrofi", level: "O'rtacha" },
       { name: "Markaz ko'chasi", level: "Yuqori" },
@@ -40,7 +34,6 @@ const regions: Record<string, Region> = {
     rushHour: "08:00 - 09:30, 17:30 - 19:00",
   },
   andijon: {
-    name: "Andijon",
     zones: [
       { name: "Bobur bog'i atrofi", level: "O'rtacha" },
       { name: "Markaz bozori", level: "Yuqori" },
@@ -50,7 +43,6 @@ const regions: Record<string, Region> = {
     rushHour: "07:30 - 09:00, 17:00 - 18:30",
   },
   namangan: {
-    name: "Namangan",
     zones: [
       { name: "Markaz atrofi", level: "O'rtacha" },
       { name: "Chorsu bozori", level: "Yuqori" },
@@ -60,7 +52,6 @@ const regions: Record<string, Region> = {
     rushHour: "08:00 - 09:30, 17:00 - 18:30",
   },
   fargona: {
-    name: "Farg'ona",
     zones: [
       { name: "Al-Farg'oniy ko'chasi", level: "O'rtacha" },
       { name: "Markaz bozori", level: "Yuqori" },
@@ -70,7 +61,6 @@ const regions: Record<string, Region> = {
     rushHour: "07:30 - 09:00, 17:00 - 19:00",
   },
   nukus: {
-    name: "Nukus",
     zones: [
       { name: "Markaz atrofi", level: "O'rtacha" },
       { name: "Berdax ko'chasi", level: "Past" },
@@ -80,7 +70,6 @@ const regions: Record<string, Region> = {
     rushHour: "08:00 - 09:30, 17:30 - 19:00",
   },
   xorazm: {
-    name: "Xorazm (Urganch)",
     zones: [
       { name: "Markaz atrofi", level: "O'rtacha" },
       { name: "Xiva yo'li", level: "Past" },
@@ -90,7 +79,6 @@ const regions: Record<string, Region> = {
     rushHour: "08:00 - 09:30, 17:00 - 18:30",
   },
   qashqadaryo: {
-    name: "Qashqadaryo (Qarshi)",
     zones: [
       { name: "Markaz atrofi", level: "O'rtacha" },
       { name: "Nasaf ko'chasi", level: "Yuqori" },
@@ -100,17 +88,15 @@ const regions: Record<string, Region> = {
     rushHour: "07:30 - 09:00, 17:00 - 18:30",
   },
   surxondaryo: {
-    name: "Surxondaryo (Termiz)",
     zones: [
       { name: "Markaz atrofi", level: "O'rtacha" },
-      { name: "Chegarа yo'li", level: "Past" },
+      { name: "Chegara yo'li", level: "Past" },
       { name: "Bozor atrofi", level: "Yuqori" },
       { name: "Aeroport tomon", level: "Past" },
     ],
     rushHour: "08:00 - 09:30, 17:30 - 19:00",
   },
   jizzax: {
-    name: "Jizzax",
     zones: [
       { name: "Markaz ko'chasi", level: "O'rtacha" },
       { name: "Bozor atrofi", level: "Yuqori" },
@@ -120,7 +106,6 @@ const regions: Record<string, Region> = {
     rushHour: "07:30 - 09:00, 17:00 - 18:30",
   },
   sirdaryo: {
-    name: "Sirdaryo (Guliston)",
     zones: [
       { name: "Markaz atrofi", level: "O'rtacha" },
       { name: "Bozor atrofi", level: "O'rtacha" },
@@ -130,7 +115,6 @@ const regions: Record<string, Region> = {
     rushHour: "08:00 - 09:30, 17:00 - 18:30",
   },
   navoiy: {
-    name: "Navoiy",
     zones: [
       { name: "Markaz atrofi", level: "O'rtacha" },
       { name: "Sanoat zonasi", level: "Yuqori" },
@@ -140,7 +124,6 @@ const regions: Record<string, Region> = {
     rushHour: "07:30 - 09:00, 17:00 - 18:30",
   },
   toshkent_vil: {
-    name: "Toshkent viloyati",
     zones: [
       { name: "Chirchiq markazi", level: "O'rtacha" },
       { name: "Olmaliq yo'li", level: "Past" },
@@ -158,7 +141,7 @@ const levelStyles: Record<string, string> = {
 };
 
 const TrafficMap = () => {
-  const [selected, setSelected] = useState("toshkent");
+  const { selected, setSelected, regionName } = useRegion();
   const region = regions[selected];
 
   return (
@@ -171,18 +154,15 @@ const TrafficMap = () => {
         </div>
 
         <div className="max-w-2xl mx-auto">
-          {/* Region Selector */}
           <div className="mb-6 flex items-center gap-3">
             <MapPin className="h-5 w-5 text-primary" />
-            <Select value={selected} onValueChange={setSelected}>
+            <Select value={selected} onValueChange={(v) => setSelected(v as RegionKey)}>
               <SelectTrigger className="w-full max-w-xs">
                 <SelectValue placeholder="Viloyatni tanlang" />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(regions).map(([key, r]) => (
-                  <SelectItem key={key} value={key}>
-                    {r.name}
-                  </SelectItem>
+                {Object.entries(regionNames).map(([key, name]) => (
+                  <SelectItem key={key} value={key}>{name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -191,20 +171,11 @@ const TrafficMap = () => {
           <div className="bg-secondary rounded-2xl p-8 mb-8 relative overflow-hidden">
             <div className="absolute inset-0 opacity-10">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute h-px bg-secondary-foreground/30"
-                  style={{
-                    top: `${12 + i * 12}%`,
-                    left: "5%",
-                    right: "5%",
-                    transform: `rotate(${(i % 3 - 1) * 15}deg)`,
-                  }}
-                />
+                <div key={i} className="absolute h-px bg-secondary-foreground/30" style={{ top: `${12 + i * 12}%`, left: "5%", right: "5%", transform: `rotate(${(i % 3 - 1) * 15}deg)` }} />
               ))}
             </div>
             <div className="relative text-center text-secondary-foreground">
-              <div className="text-6xl font-extrabold mb-2">{region.name}</div>
+              <div className="text-6xl font-extrabold mb-2">{regionName}</div>
               <p className="text-secondary-foreground/60 text-sm">Real vaqt tirbandlik ma'lumotlari</p>
               <div className="flex justify-center gap-6 mt-6">
                 <div className="flex items-center gap-2 text-sm">
