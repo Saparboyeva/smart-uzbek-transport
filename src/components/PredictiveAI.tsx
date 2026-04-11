@@ -1,46 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Brain, Clock, TrendingUp, AlertTriangle, Navigation, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-type Prediction = {
-  id: number;
-  route: string;
-  from: string;
-  to: string;
-  time: string;
-  level: "Yuqori" | "O'rtacha" | "Past";
-  message: string;
-  suggestion: string;
-  minutesUntil: number;
-  confidence: number;
-};
-
-const mockPredictions: Prediction[] = [
-  {
-    id: 1, route: "Chilonzor → Yunusobod", from: "Chilonzor", to: "Yunusobod",
-    time: "18:00", level: "Yuqori", minutesUntil: 30, confidence: 92,
-    message: "30 daqiqadan keyin bu yo'l tiqilib ketadi",
-    suggestion: "Buyuk Ipak Yo'li orqali boring — 15 daqiqa tezroq",
-  },
-  {
-    id: 2, route: "Sergeli → Markaz", from: "Sergeli", to: "Markaz",
-    time: "17:30", level: "O'rtacha", minutesUntil: 45, confidence: 78,
-    message: "45 daqiqadan keyin o'rtacha tirbandlik kutilmoqda",
-    suggestion: "Metro orqali boring — tirbandlikdan qochish mumkin",
-  },
-  {
-    id: 3, route: "Olmazor → Yakkasaroy", from: "Olmazor", to: "Yakkasaroy",
-    time: "08:15", level: "Yuqori", minutesUntil: 15, confidence: 95,
-    message: "15 daqiqadan keyin kuchli tirbandlik boshlanadi",
-    suggestion: "Hozir yo'lga chiqing yoki 09:30 gacha kuting",
-  },
-  {
-    id: 4, route: "Mirzo Ulug'bek → Bektemir", from: "Mirzo Ulug'bek", to: "Bektemir",
-    time: "19:00", level: "Past", minutesUntil: 60, confidence: 65,
-    message: "Yo'l bo'sh bo'ladi, tirbandlik kutilmaydi",
-    suggestion: "Bemalol yo'lga chiqishingiz mumkin",
-  },
-];
+import { useRegion } from "@/contexts/RegionContext";
+import { regionPredictions } from "@/data/regionData";
 
 const levelColor: Record<string, string> = {
   Yuqori: "bg-destructive/10 text-destructive border-destructive/20",
@@ -55,7 +17,9 @@ const levelDot: Record<string, string> = {
 };
 
 const PredictiveAI = () => {
-  const [activePrediction, setActivePrediction] = useState<Prediction | null>(null);
+  const { selected, regionName } = useRegion();
+  const predictions = regionPredictions[selected];
+  const [activePrediction, setActivePrediction] = useState<typeof predictions[0] | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const { toast } = useToast();
 
@@ -64,7 +28,7 @@ const PredictiveAI = () => {
     setActivePrediction(null);
     setTimeout(() => {
       setAnalyzing(false);
-      const pick = mockPredictions[Math.floor(Math.random() * mockPredictions.length)];
+      const pick = predictions[Math.floor(Math.random() * predictions.length)];
       setActivePrediction(pick);
       toast({ title: "🧠 AI bashorat tayyor", description: pick.message });
     }, 2000);
@@ -78,7 +42,7 @@ const PredictiveAI = () => {
             <Brain className="h-4 w-4" /> Predictive AI
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mt-2">
-            Tirbandlikni oldindan bashorat qilish
+            Tirbandlikni oldindan bashorat qilish — {regionName}
           </h2>
           <p className="text-muted-foreground mt-3 max-w-lg mx-auto">
             AI oldingi ma'lumotlar, vaqt, ob-havo va bayramlarni tahlil qilib, tirbandlikni oldindan aytadi
@@ -86,7 +50,6 @@ const PredictiveAI = () => {
         </div>
 
         <div className="max-w-2xl mx-auto">
-          {/* Analysis Button */}
           <button
             onClick={runAnalysis}
             disabled={analyzing}
@@ -105,7 +68,6 @@ const PredictiveAI = () => {
             )}
           </button>
 
-          {/* Active Prediction */}
           {activePrediction && (
             <div className="bg-card rounded-2xl shadow-card overflow-hidden mb-8 animate-fade-in">
               <div className="bg-secondary p-4 flex items-center gap-3">
@@ -130,29 +92,24 @@ const PredictiveAI = () => {
                     <p className="text-sm text-card-foreground mt-1">{activePrediction.suggestion}</p>
                   </div>
                 </div>
-                {/* Confidence bar */}
                 <div>
                   <div className="flex justify-between text-xs text-muted-foreground mb-1">
                     <span>AI ishonchliligi</span>
                     <span>{activePrediction.confidence}%</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary rounded-full transition-all duration-1000"
-                      style={{ width: `${activePrediction.confidence}%` }}
-                    />
+                    <div className="h-full bg-primary rounded-full transition-all duration-1000" style={{ width: `${activePrediction.confidence}%` }} />
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* All predictions list */}
           <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-primary" /> Barcha bashoratlar
           </h3>
           <div className="space-y-3">
-            {mockPredictions.map((p) => (
+            {predictions.map((p) => (
               <div
                 key={p.id}
                 onClick={() => { setActivePrediction(p); toast({ title: `📊 ${p.route}`, description: p.message }); }}

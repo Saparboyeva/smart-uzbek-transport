@@ -1,3 +1,4 @@
+import { RegionProvider } from "@/contexts/RegionContext";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
@@ -12,20 +13,22 @@ import SafetyAI from "@/components/SafetyAI";
 import Footer from "@/components/Footer";
 
 const Index = () => (
-  <div className="min-h-screen scroll-smooth">
-    <Navbar />
-    <HeroSection />
-    <FeaturesSection />
-    <BusTracker />
-    <RouteCalculator />
-    <CarpoolSection />
-    <TrafficMap />
-    <PredictiveAI />
-    <PersonalAI />
-    <VoiceAssistant />
-    <SafetyAI />
-    <Footer />
-  </div>
+  <RegionProvider>
+    <div className="min-h-screen scroll-smooth">
+      <Navbar />
+      <HeroSection />
+      <FeaturesSection />
+      <BusTracker />
+      <RouteCalculator />
+      <CarpoolSection />
+      <TrafficMap />
+      <PredictiveAI />
+      <PersonalAI />
+      <VoiceAssistant />
+      <SafetyAI />
+      <Footer />
+    </div>
+  </RegionProvider>
 );
 
 export default Index;
