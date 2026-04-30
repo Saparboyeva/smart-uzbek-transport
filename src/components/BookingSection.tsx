@@ -187,7 +187,9 @@ const BookingSection = () => {
         {/* Results */}
         <div className="max-w-5xl mx-auto space-y-3">
           {filtered.map((trip) => {
-            const isBooked = bookedIds.includes(trip.id);
+            const userBookingCount = bookings.filter((b) => b.tripId === trip.id).reduce((s, b) => s + b.passengers, 0);
+            const isBooked = userBookingCount > 0;
+            const soldOut = trip.seatsLeft === 0;
             const Icon = type === "flight" ? Plane : Train;
             return (
               <div key={trip.id} className="bg-card rounded-2xl shadow-card hover:shadow-card-hover transition-shadow p-5">
@@ -227,12 +229,16 @@ const BookingSection = () => {
                     </div>
                     <button
                       onClick={() => handleBook(trip)}
-                      disabled={isBooked}
+                      disabled={soldOut}
                       className={`px-4 py-2 rounded-lg text-xs font-semibold transition-opacity ${
-                        isBooked ? "bg-success text-white cursor-default" : "bg-primary text-primary-foreground hover:opacity-90"
+                        soldOut
+                          ? "bg-muted text-muted-foreground cursor-not-allowed"
+                          : isBooked
+                          ? "bg-success text-white hover:opacity-90"
+                          : "bg-primary text-primary-foreground hover:opacity-90"
                       }`}
                     >
-                      {isBooked ? (<span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> Bron qilingan</span>) : "Bron qilish"}
+                      {soldOut ? "Joy yo'q" : isBooked ? (<span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> Yana bron</span>) : "Bron qilish"}
                     </button>
                   </div>
                 </div>
