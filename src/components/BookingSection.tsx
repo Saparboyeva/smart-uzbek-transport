@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plane, Train, Calendar, MapPin, Users, ArrowRight, Clock, Search, CheckCircle2 } from "lucide-react";
+import { Plane, Train, Calendar, MapPin, Users, ArrowRight, Clock, Search, CheckCircle2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type TransportType = "flight" | "train";
@@ -18,7 +18,7 @@ type Trip = {
   class: string;
 };
 
-const flights: Trip[] = [
+const initialFlights: Trip[] = [
   { id: "f1", carrier: "Uzbekistan Airways", code: "HY 271", from: "Toshkent (TAS)", to: "Samarqand (SKD)", depart: "08:30", arrive: "09:25", duration: "55 daq", price: 850000, seatsLeft: 12, class: "Economy" },
   { id: "f2", carrier: "Qanot Sharq", code: "HH 102", from: "Toshkent (TAS)", to: "Buxoro (BHK)", depart: "11:00", arrive: "12:10", duration: "1s 10daq", price: 920000, seatsLeft: 6, class: "Economy" },
   { id: "f3", carrier: "Uzbekistan Airways", code: "HY 045", from: "Toshkent (TAS)", to: "Nukus (NCU)", depart: "14:15", arrive: "16:00", duration: "1s 45daq", price: 1100000, seatsLeft: 18, class: "Economy" },
@@ -26,13 +26,15 @@ const flights: Trip[] = [
   { id: "f5", carrier: "Uzbekistan Airways", code: "HY 311", from: "Toshkent (TAS)", to: "Farg'ona (FEG)", depart: "20:00", arrive: "20:45", duration: "45 daq", price: 720000, seatsLeft: 22, class: "Economy" },
 ];
 
-const trains: Trip[] = [
+const initialTrains: Trip[] = [
   { id: "t1", carrier: "Afrosiyob", code: "762Ф", from: "Toshkent", to: "Samarqand", depart: "07:00", arrive: "09:10", duration: "2s 10daq", price: 220000, seatsLeft: 34, class: "Biznes" },
   { id: "t2", carrier: "Sharq", code: "10Ф", from: "Toshkent", to: "Buxoro", depart: "08:15", arrive: "15:30", duration: "7s 15daq", price: 180000, seatsLeft: 56, class: "Kupe" },
   { id: "t3", carrier: "Afrosiyob", code: "764Ф", from: "Toshkent", to: "Qarshi", depart: "08:00", arrive: "11:55", duration: "3s 55daq", price: 240000, seatsLeft: 28, class: "Biznes" },
   { id: "t4", carrier: "Registon", code: "60Ф", from: "Toshkent", to: "Samarqand", depart: "17:30", arrive: "20:50", duration: "3s 20daq", price: 150000, seatsLeft: 42, class: "Iqtisodiy" },
   { id: "t5", carrier: "Sharq", code: "12Ф", from: "Toshkent", to: "Xiva", depart: "20:30", arrive: "12:15", duration: "15s 45daq", price: 320000, seatsLeft: 18, class: "Kupe" },
 ];
+
+type Booking = { tripId: string; passengers: number; date: string; bookedAt: number };
 
 const BookingSection = () => {
   const { toast } = useToast();
@@ -43,15 +45,21 @@ const BookingSection = () => {
   const [passengers, setPassengers] = useState(1);
   const [searched, setSearched] = useState(false);
   const [selected, setSelected] = useState<Trip | null>(null);
-  const [bookedIds, setBookedIds] = useState<string[]>([]);
+  const [flights, setFlights] = useState<Trip[]>(initialFlights);
+  const [trains, setTrains] = useState<Trip[]>(initialTrains);
+  const [bookings, setBookings] = useState<Booking[]>([]);
 
   const trips = type === "flight" ? flights : trains;
+  const setTrips = type === "flight" ? setFlights : setTrains;
   const filtered = searched
     ? trips.filter((t) =>
         (!to || t.to.toLowerCase().includes(to.toLowerCase())) &&
         t.from.toLowerCase().includes(from.toLowerCase())
       )
     : trips;
+
+  const findTrip = (id: string): Trip | undefined =>
+    [...flights, ...trains].find((t) => t.id === id);
 
   const handleSearch = () => {
     if (!from.trim()) {
@@ -63,17 +71,36 @@ const BookingSection = () => {
   };
 
   const handleBook = (trip: Trip) => {
+    if (trip.seatsLeft < passengers) {
+      toast({ title: "Joy yetarli emas", description: `Faqat ${trip.seatsLeft} joy bo'sh`, variant: "destructive" });
+      return;
+    }
     setSelected(trip);
   };
 
   const confirmBooking = () => {
     if (!selected) return;
-    setBookedIds((p) => [...p, selected.id]);
+    const tripId = selected.id;
+    const pax = passengers;
+    setTrips((prev) => prev.map((t) => (t.id === tripId ? { ...t, seatsLeft: t.seatsLeft - pax } : t)));
+    setBookings((p) => [...p, { tripId, passengers: pax, date, bookedAt: Date.now() }]);
     toast({
       title: "Bron tasdiqlandi ✅",
-      description: `${selected.carrier} ${selected.code} — ${passengers} yo'lovchi. Jami: ${(selected.price * passengers).toLocaleString()} so'm`,
+      description: `${selected.carrier} ${selected.code} — ${pax} yo'lovchi. Jami: ${(selected.price * pax).toLocaleString()} so'm`,
     });
     setSelected(null);
+  };
+
+  const cancelBooking = (bookedAt: number) => {
+    const booking = bookings.find((b) => b.bookedAt === bookedAt);
+    if (!booking) return;
+    const trip = findTrip(booking.tripId);
+    if (!trip) return;
+    const isFlight = flights.some((f) => f.id === booking.tripId);
+    const setter = isFlight ? setFlights : setTrains;
+    setter((prev) => prev.map((t) => (t.id === booking.tripId ? { ...t, seatsLeft: t.seatsLeft + booking.passengers } : t)));
+    setBookings((p) => p.filter((b) => b.bookedAt !== bookedAt));
+    toast({ title: "Bron bekor qilindi", description: `${trip.carrier} ${trip.code} — ${booking.passengers} joy qayta ochildi` });
   };
 
   return (
@@ -160,7 +187,9 @@ const BookingSection = () => {
         {/* Results */}
         <div className="max-w-5xl mx-auto space-y-3">
           {filtered.map((trip) => {
-            const isBooked = bookedIds.includes(trip.id);
+            const userBookingCount = bookings.filter((b) => b.tripId === trip.id).reduce((s, b) => s + b.passengers, 0);
+            const isBooked = userBookingCount > 0;
+            const soldOut = trip.seatsLeft === 0;
             const Icon = type === "flight" ? Plane : Train;
             return (
               <div key={trip.id} className="bg-card rounded-2xl shadow-card hover:shadow-card-hover transition-shadow p-5">
@@ -200,12 +229,16 @@ const BookingSection = () => {
                     </div>
                     <button
                       onClick={() => handleBook(trip)}
-                      disabled={isBooked}
+                      disabled={soldOut}
                       className={`px-4 py-2 rounded-lg text-xs font-semibold transition-opacity ${
-                        isBooked ? "bg-success text-white cursor-default" : "bg-primary text-primary-foreground hover:opacity-90"
+                        soldOut
+                          ? "bg-muted text-muted-foreground cursor-not-allowed"
+                          : isBooked
+                          ? "bg-success text-white hover:opacity-90"
+                          : "bg-primary text-primary-foreground hover:opacity-90"
                       }`}
                     >
-                      {isBooked ? (<span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> Bron qilingan</span>) : "Bron qilish"}
+                      {soldOut ? "Joy yo'q" : isBooked ? (<span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> Yana bron</span>) : "Bron qilish"}
                     </button>
                   </div>
                 </div>
@@ -216,6 +249,47 @@ const BookingSection = () => {
             <div className="text-center py-12 text-muted-foreground">Variantlar topilmadi. Boshqa shaharni tanlab ko'ring.</div>
           )}
         </div>
+
+        {/* My Bookings */}
+        {bookings.length > 0 && (
+          <div className="max-w-5xl mx-auto mt-12">
+            <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-success" /> Mening bronlarim ({bookings.length})
+            </h3>
+            <div className="space-y-3">
+              {bookings.map((b) => {
+                const trip = findTrip(b.tripId);
+                if (!trip) return null;
+                const isFlight = flights.some((f) => f.id === b.tripId);
+                const Icon = isFlight ? Plane : Train;
+                return (
+                  <div key={b.bookedAt} className="bg-card rounded-2xl shadow-card p-4 flex items-center gap-4">
+                    <div className="w-10 h-10 bg-success/10 rounded-xl flex items-center justify-center shrink-0">
+                      <Icon className="h-5 w-5 text-success" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-card-foreground text-sm truncate">
+                        {trip.carrier} • {trip.code}
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {trip.from} → {trip.to} • {b.date} • {trip.depart}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {b.passengers} yo'lovchi • {(trip.price * b.passengers).toLocaleString()} so'm
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => cancelBooking(b.bookedAt)}
+                      className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-semibold bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                    >
+                      <X className="h-3 w-3" /> Bekor qilish
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Confirmation Modal */}
         {selected && (
