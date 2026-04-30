@@ -250,6 +250,47 @@ const BookingSection = () => {
           )}
         </div>
 
+        {/* My Bookings */}
+        {bookings.length > 0 && (
+          <div className="max-w-5xl mx-auto mt-12">
+            <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-success" /> Mening bronlarim ({bookings.length})
+            </h3>
+            <div className="space-y-3">
+              {bookings.map((b) => {
+                const trip = findTrip(b.tripId);
+                if (!trip) return null;
+                const isFlight = flights.some((f) => f.id === b.tripId);
+                const Icon = isFlight ? Plane : Train;
+                return (
+                  <div key={b.bookedAt} className="bg-card rounded-2xl shadow-card p-4 flex items-center gap-4">
+                    <div className="w-10 h-10 bg-success/10 rounded-xl flex items-center justify-center shrink-0">
+                      <Icon className="h-5 w-5 text-success" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-card-foreground text-sm truncate">
+                        {trip.carrier} • {trip.code}
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {trip.from} → {trip.to} • {b.date} • {trip.depart}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {b.passengers} yo'lovchi • {(trip.price * b.passengers).toLocaleString()} so'm
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => cancelBooking(b.bookedAt)}
+                      className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-semibold bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                    >
+                      <X className="h-3 w-3" /> Bekor qilish
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Confirmation Modal */}
         {selected && (
           <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setSelected(null)}>
