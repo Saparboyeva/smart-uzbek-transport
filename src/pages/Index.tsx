@@ -10,6 +10,7 @@ import PredictiveAI from "@/components/PredictiveAI";
 import PersonalAI from "@/components/PersonalAI";
 import VoiceAssistant from "@/components/VoiceAssistant";
 import SafetyAI from "@/components/SafetyAI";
+import BookingSection from "@/components/BookingSection";
 import Footer from "@/components/Footer";
 
 const Index = () => (
@@ -26,6 +27,7 @@ const Index = () => (
       <PersonalAI />
       <VoiceAssistant />
       <SafetyAI />
+      <BookingSection />
       <Footer />
     </div>
   </RegionProvider>
