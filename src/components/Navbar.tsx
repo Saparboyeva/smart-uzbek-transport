@@ -7,6 +7,7 @@ const navLinks = [
   { label: "Kuzatuv", href: "#tracker" },
   { label: "Yo'nalish", href: "#route" },
   { label: "Carpool", href: "#carpool" },
+  { label: "Bron", href: "#booking" },
 ];
 
 const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
